@@ -1,65 +1,73 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Layout from "../components/Layout";
+import Card from "../components/Card";
+import { useEffect, useState } from "react";
+import styled from "styled-components";
+
+const ProjectTitle = styled.h1`
+	color: #eeeeee;
+	font-size: 4rem;
+	font-weight: bolder;
+	min-width: 30%;
+	max-width: 80%;
+	margin: 0 auto;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+		"Helvetica Neue", sans-serif;
+`;
+
+const ProjectContainer = styled.div`
+	min-width: 60%;
+	max-width: 100%;
+	margin: 0 auto;
+`;
+
+const ProjectWrapper = styled.div`
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	min-width: 30%;
+	margin: 0 auto;
+	max-width: 80%;
+`;
 
 export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+	const [repos, setRepos] = useState([]);
+	const [loading, setLoading] = useState(true);
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+	useEffect(() => {
+		fetchRepos();
+	}, []);
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+	async function fetchRepos() {
+		const req = await fetch(
+			"https://api.github.com/users/ElGodzilla/repos"
+		);
+		const res = await req.json();
+		setRepos(res);
+		setLoading(false);
+	}
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+	return (
+		<Layout page={"My Portfogit"}>
+			<ProjectContainer>
+				<ProjectTitle>Work_</ProjectTitle>
+				<ProjectWrapper>
+					{loading ? (
+						<div>Loading ...</div>
+					) : (
+						repos.map((repo) => (
+							<Card
+								key={repo.id}
+								name={repo.name}
+								desc={repo.description}
+								techno={repo.language}
+								url={repo.html_url}
+								forks={repo.forks}
+							/>
+						))
+					)}
+				</ProjectWrapper>
+			</ProjectContainer>
+		</Layout>
+	);
 }
