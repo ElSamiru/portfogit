@@ -1,8 +1,8 @@
 import Head from "next/head";
 import GlobalStyle from "../styles/GlobalStyle";
-import useSWR from "swr";
 import { Header } from "./Header/Header";
 import styled from "styled-components";
+import { useState, useEffect } from "react";
 
 const Container = styled.div`
 	display: flex;
@@ -11,15 +11,22 @@ const Container = styled.div`
 	width: 100%;
 `;
 
-const fetcher = (url) =>
-	fetch(url).then((res) => res.json());
-
 export default function Layout({ children, page }) {
-	const { data, error } = useSWR("./api/github", fetcher);
-	// const numProjects = data?.numProjects;
-	const avatar = data?.avatar;
-	const name = data?.name;
-	const gitUrl = data?.gitUrl;
+	const [git, setGit] = useState([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		fetchGit();
+	}, []);
+
+	async function fetchGit() {
+		const req = await fetch(
+			"https://api.github.com/users/ElGodzilla"
+		);
+		const res = await req.json();
+		setGit(res);
+		setLoading(false);
+	}
 
 	return (
 		<>
@@ -28,7 +35,18 @@ export default function Layout({ children, page }) {
 			</Head>
 			<GlobalStyle />
 			<Container>
-				<Header logo={avatar} name={name} url={gitUrl} />
+				{loading ? (
+					<div>Loading ...</div>
+				) : (
+					git.map((item) => (
+						<Header
+							key={repo.id}
+							name={item.login}
+							logo={item.avata_url}
+							url={item.html_url}
+						/>
+					))
+				)}
 				{children}
 			</Container>
 		</>
