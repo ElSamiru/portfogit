@@ -12,8 +12,7 @@ const Container = styled.div`
 `;
 
 export default function Layout({ children, page }) {
-	const [git, setGit] = useState([]);
-	const [loading, setLoading] = useState(true);
+	const [gits, setGits] = useState([]);
 
 	useEffect(() => {
 		fetchGit();
@@ -24,8 +23,7 @@ export default function Layout({ children, page }) {
 			"https://api.github.com/users/ElGodzilla"
 		);
 		const res = await req.json();
-		setGit(res);
-		setLoading(false);
+		setGits(res);
 	}
 
 	return (
@@ -35,18 +33,11 @@ export default function Layout({ children, page }) {
 			</Head>
 			<GlobalStyle />
 			<Container>
-				{loading ? (
-					<div>Loading ...</div>
-				) : (
-					git.map((item) => (
-						<Header
-							key={repo.id}
-							name={item.login}
-							logo={item.avata_url}
-							url={item.html_url}
-						/>
-					))
-				)}
+				<Header
+					name={gits.login}
+					logo={gits.avatar_url}
+					url={gits.html_url}
+				/>
 				{children}
 			</Container>
 		</>
